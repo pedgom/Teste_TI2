@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using UniqueDrinks.Models;
+using teste.Models;
 
 namespace teste.Data
 {

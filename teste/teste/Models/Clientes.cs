@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace UniqueDrinks.Models
+namespace teste.Models
 {
     /// <summary>
     /// Dados sobre o Cliente

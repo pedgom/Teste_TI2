@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace UniqueDrinks.Models
+namespace teste.Models
 {
 
     /// <summary>
