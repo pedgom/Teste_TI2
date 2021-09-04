@@ -23,6 +23,12 @@ namespace teste.Data
         {
             modelBuilder.Entity<Reservas>()
                 .HasKey(k => new { k.ClienteFK, k.BebidaFK });
+
+            modelBuilder.Entity<Bebidas>()
+                .Property(p => p.Preco)
+                .HasColumnType("decimal (18,4)");
+
+            base.OnModelCreating(modelBuilder);
         }
     }
 }
