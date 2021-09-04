@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -12,11 +15,17 @@ namespace teste.Controllers
 {
     public class ClientesController : Controller
     {
+        /// <summary>
+        /// variável que identifica a BD do projeto
+        /// </summary>
         private readonly Teste _context;
 
-        public ClientesController(Teste context)
+        private readonly IWebHostEnvironment _caminho;
+
+        public ClientesController(Teste context, IWebHostEnvironment caminho)
         {
             _context = context;
+            _caminho = caminho;
         }
 
         // GET: Clientes
@@ -54,15 +63,57 @@ namespace teste.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Nome,Email,Contacto,Datanasc")] Clientes clientes)
+        public async Task<IActionResult> Create([Bind("Id,Nome,Email,Contacto,Datanasc,Fotografia")] Clientes cliente, IFormFile fotoCliente)
         {
+            string caminhoCompleto = "";
+            bool himage = false;
+
+            if (fotoCliente == null) { cliente.Fotografia = "noUser.jpg"; }
+            else
+            {
+                if (fotoCliente.ContentType == "image/jpeg" || fotoCliente.ContentType == "image/jpg" || fotoCliente.ContentType == "image/png")
+                {
+                   
+                    Guid g;
+                    g = Guid.NewGuid();
+                    string extensao = Path.GetExtension(fotoCliente.FileName).ToLower();
+                    string nome = g.ToString() + extensao;
+
+                    
+                    caminhoCompleto = Path.Combine(_caminho.WebRootPath, "Imagens", nome);
+
+                   
+                    cliente.Fotografia = nome;
+
+                   
+                    himage = true;
+                }
+                else
+                {
+               
+                    cliente.Fotografia = "noUser.jpg";
+                }
+            }
+
             if (ModelState.IsValid)
             {
-                _context.Add(clientes);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                try
+                {
+                    _context.Add(cliente);
+                    await _context.SaveChangesAsync();
+                    if (himage)
+                    {
+                        using var stream = new FileStream(caminhoCompleto, FileMode.Create);
+                        await fotoCliente.CopyToAsync(stream);
+                    }
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.StackTrace);
+                }
             }
-            return View(clientes);
+            return View(cliente);
         }
 
         // GET: Clientes/Edit/5
@@ -86,7 +137,7 @@ namespace teste.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Nome,Email,Contacto,Datanasc")] Clientes clientes)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Nome,Email,Contacto,Datanasc,Fotografia")] Clientes clientes)
         {
             if (id != clientes.Id)
             {

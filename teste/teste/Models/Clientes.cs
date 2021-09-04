@@ -57,6 +57,9 @@ namespace teste.Models
         [Required]
         public DateTime Datanasc { get; set; }
 
+
+        public string Fotografia { get; set; }
+
         /// <summary>
         /// lista de Reservas associadas ao Cliente
         /// </summary>
