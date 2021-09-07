@@ -31,7 +31,7 @@ namespace teste.Models
         /// <summary>
         /// Lista das Bebidas que são da Categoria
         /// </summary>
-        public ICollection<Bebidas> ListaDeBebidas { get; set; }
+        public virtual ICollection<Bebidas> ListaDeBebidas { get; set; }
 
     }
 }

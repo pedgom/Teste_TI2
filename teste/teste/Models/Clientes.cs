@@ -63,6 +63,9 @@ namespace teste.Models
         /// <summary>
         /// lista de Reservas associadas ao Cliente
         /// </summary>
-        public ICollection<Reservas> ListaDeReservas { get; set; }
+        public virtual ICollection<Reservas> ListaDeReservas { get; set; }
+
+
+        public string Username { get; set; }
     }
 }

@@ -28,6 +28,6 @@ namespace teste.Models
         [ForeignKey(nameof(Bebida))]
         [Display(Name = "Bebida")]
         public int BebidaFK { get; set; }
-        public Bebidas Bebida { get; set; }
+        public virtual Bebidas Bebida { get; set; }
     }
 }

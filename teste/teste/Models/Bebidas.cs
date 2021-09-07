@@ -17,7 +17,7 @@ namespace teste.Models
             // inicializar a lista de Fotografias de cada uma das Bebidas
             ListaDeImagens = new HashSet<Imagens>();
             // inicializar a lista de Clientes das Reservas de Bebidas
-            ListaDeClientes = new HashSet<Reservas>();
+            ListaDeReservas = new HashSet<Reservas>();
         }
 
         /// <summary>
@@ -61,14 +61,14 @@ namespace teste.Models
         public Categorias Categoria { get; set; }
 
         /// <summary>
-        /// Lista dos Clientes referentes à Reserva das Bebidas
+        /// Lista das Reservas referentes às Bebidas
         /// </summary>
-        public ICollection<Reservas> ListaDeClientes { get; set; }
+        public virtual ICollection<Reservas> ListaDeReservas { get; set; }
 
         /// <summary>
         /// Lista das Fotografias da bebida
         /// </summary>
-        public ICollection<Imagens> ListaDeImagens { get; set; }
+        public virtual ICollection<Imagens> ListaDeImagens { get; set; }
 
 
 

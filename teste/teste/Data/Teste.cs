@@ -14,10 +14,11 @@ namespace teste.Data
         {
         }
 
-        public DbSet<Clientes> Clientes { get; set; }
-        public DbSet<Bebidas> Bebidas { get; set; }
-        public DbSet<Categorias> Categorias { get; set; }
-        public DbSet<Imagens> Imagens { get; set; }
+        public virtual DbSet<Clientes> Clientes { get; set; }
+        public virtual DbSet<Bebidas> Bebidas { get; set; }
+        public virtual DbSet<Categorias> Categorias { get; set; }
+        public virtual DbSet<Imagens> Imagens { get; set; }
+        public virtual DbSet<Reservas> Reservas { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

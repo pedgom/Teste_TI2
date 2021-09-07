@@ -34,7 +34,7 @@ namespace teste.Models
         /// </summary>
         public string Estado { get; set; }
 
-        /// <summary>
+        /// <summary> 
         /// Quantidade de produtos a reservar
         /// </summary>
         public int Quantidade { get; set; }
@@ -45,7 +45,7 @@ namespace teste.Models
         /// </summary>
         [ForeignKey(nameof(Bebida))]
         public int BebidaFK { get; set; }
-        public Bebidas Bebida { get; set; }
+        public virtual Bebidas Bebida { get; set; }
 
 
         /// <summary>
@@ -53,6 +53,6 @@ namespace teste.Models
         /// </summary>
         [ForeignKey(nameof(Cliente))]
         public int ClienteFK { get; set; }
-        public Clientes Cliente { get; set; }
+        public virtual Clientes Cliente { get; set; }
     }
 }
