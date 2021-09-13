@@ -1,10 +1,10 @@
 ﻿@model teste.Models.Reservas
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Detalhes";
 }
 
-<h1>Details</h1>
+<h1>Detalhes</h1>
 
 <div>
     <h4>Reservas</h4>
@@ -55,6 +55,7 @@
     </dl>
 </div>
 <div>
-    @Html.ActionLink("Edit", "Edit", new { /* id = Model.PrimaryKey */ }) |
-    <a asp-action="Index">Back to List</a>
+    
+    <a asp-action="Edit" asp-route-id="@Model.Id">Editar</a>|
+    <a asp-action="Index">Voltar à lista</a>
 </div>

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -7,8 +8,28 @@ using teste.Models;
 
 namespace teste.Data
 {
-    public class Teste : IdentityDbContext
+    /// <summary>
+    /// classe para recolher os dados particulares dos Utilizadores
+    /// </summary>
+    public class ApplicationUser : IdentityUser
     {
+        public string Nome { get; set; }
+
+        public string Fotografia { get; set; }
+
+        public DateTime RegisterTime { get; set; }
+
+
+    }
+
+    /// <summary>
+    /// criação da BD do projeto
+    /// </summary>
+   
+
+    public class Teste : IdentityDbContext<ApplicationUser>
+    {
+
         public Teste(DbContextOptions<Teste> options)
             : base(options)
         {

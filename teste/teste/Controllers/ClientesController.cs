@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -13,6 +15,7 @@ using teste.Models;
 
 namespace teste.Controllers
 {
+    [Authorize]
     public class ClientesController : Controller
     {
         /// <summary>
@@ -22,10 +25,13 @@ namespace teste.Controllers
 
         private readonly IWebHostEnvironment _caminho;
 
-        public ClientesController(Teste context, IWebHostEnvironment caminho)
+        private readonly UserManager<ApplicationUser> _userManager;
+
+        public ClientesController(Teste context, IWebHostEnvironment caminho, UserManager<ApplicationUser> userManager)
         {
             _context = context;
             _caminho = caminho;
+            _userManager = userManager;
         }
 
         // GET: Clientes
@@ -42,8 +48,8 @@ namespace teste.Controllers
                 return NotFound();
             }
 
-            var clientes = await _context.Clientes
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var clientes = await _context.Clientes.Where(m => m.Id == id)
+                                                   .FirstOrDefaultAsync();
             if (clientes == null)
             {
                 return NotFound();
@@ -53,6 +59,7 @@ namespace teste.Controllers
         }
 
         // GET: Clientes/Create
+        [Authorize(Roles = "Gestor")]
         public IActionResult Create()
         {
             return View();
@@ -63,6 +70,7 @@ namespace teste.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Gestor")]
         public async Task<IActionResult> Create([Bind("Id,Nome,Email,Contacto,Datanasc,Fotografia")] Clientes cliente, IFormFile fotoCliente)
         {
             string caminhoCompleto = "";
@@ -137,23 +145,57 @@ namespace teste.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Nome,Email,Contacto,Datanasc,Fotografia")] Clientes clientes)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Nome,Email,Contacto,Datanasc,Fotografia")] Clientes cliente, IFormFile fotoCliente)
         {
-            if (id != clientes.Id)
+            if (id != cliente.Id)
             {
                 return NotFound();
+            }
+
+            string caminhoCompleto = "";
+            bool hImagem = false;
+
+            if (fotoCliente == null) { cliente.Fotografia = "noUser.png"; }
+            else
+            {
+                if (fotoCliente.ContentType == "image/jpeg" || fotoCliente.ContentType == "image/jpg" || fotoCliente.ContentType == "image/png")
+                {
+
+                    Guid g;
+                    g = Guid.NewGuid();
+                    string extensao = Path.GetExtension(fotoCliente.FileName).ToLower();
+                    string nome = g.ToString() + extensao;
+
+
+                    caminhoCompleto = Path.Combine(_caminho.WebRootPath, "Imagens", nome);
+
+
+                    cliente.Fotografia = nome;
+
+                    hImagem = true;
+                }
+                else
+                {
+
+                    cliente.Fotografia = "noUser.png";
+                }
             }
 
             if (ModelState.IsValid)
             {
                 try
                 {
-                    _context.Update(clientes);
+                    _context.Update(cliente);
                     await _context.SaveChangesAsync();
+                    if (hImagem)
+                    {
+                        using var stream = new FileStream(caminhoCompleto, FileMode.Create);
+                        await fotoCliente.CopyToAsync(stream);
+                    }
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!ClientesExists(clientes.Id))
+                    if (!ClientesExists(cliente.Id))
                     {
                         return NotFound();
                     }
@@ -164,7 +206,7 @@ namespace teste.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(clientes);
+            return View(cliente);
         }
 
         // GET: Clientes/Delete/5

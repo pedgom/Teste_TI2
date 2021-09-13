@@ -32,12 +32,13 @@ namespace teste
                 );
             services.AddDatabaseDeveloperPageExceptionFilter();
 
-            services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+            services.AddDefaultIdentity<ApplicationUser>
+                (options => options.SignIn.RequireConfirmedAccount = true)
+                .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<Teste>();
             services.AddControllersWithViews();
             services.AddRazorPages();
-            services.AddDbContext<Context>(options =>
-                    options.UseSqlServer(Configuration.GetConnectionString("Context")));
+           
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
