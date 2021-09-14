@@ -49,6 +49,11 @@
                 @Html.DisplayFor(modelItem => item.Imagem)
             </td>
             <td>
+                <a asp-action="Details" asp-route-id="@item.Id">
+                    <img src="~/Imagens/@item.Imagem" height="60" alt="imagem da bebida @item.Nome" title="@item.Nome" />
+                </a>
+            </td>
+            <td>
                 @Html.DisplayFor(modelItem => item.Stock)
             </td>
             <td>

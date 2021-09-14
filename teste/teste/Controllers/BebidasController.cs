@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -14,9 +17,12 @@ namespace teste.Controllers
     {
         private readonly Teste _context;
 
-        public BebidasController(Teste context)
+        private readonly IWebHostEnvironment _caminho;
+
+        public BebidasController(Teste context, IWebHostEnvironment caminho)
         {
             _context = context;
+            _caminho = caminho;
         }
 
         // GET: Bebidas
@@ -57,16 +63,63 @@ namespace teste.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Nome,Descricao,Preco,Imagem,Stock,CategoriaFK")] Bebidas bebidas)
+        public async Task<IActionResult> Create([Bind("Id,Nome,Descricao,Preco,Imagem,Stock,CategoriaFK")] Bebidas bebida, IFormFile ImagemBeb)
         {
+            string caminhoCompleto = "";
+            bool hImagem = false;
+
+            if (ImagemBeb == null) { bebida.Imagem = "noDrink.png"; }
+            else
+            {
+                if (ImagemBeb.ContentType == "image/jpeg" || ImagemBeb.ContentType == "image/jpg" || ImagemBeb.ContentType == "image/png")
+                {               
+                    Guid g;
+                    g = Guid.NewGuid();
+                    string extensao = Path.GetExtension(ImagemBeb.FileName).ToLower();
+                    string nomeA = g.ToString() + extensao;
+
+                   
+                    caminhoCompleto = Path.Combine(_caminho.WebRootPath, "Imagens", nomeA);
+
+                    bebida.Imagem = nomeA;
+
+                    hImagem = true;
+                }
+                else
+                {
+                  
+                    bebida.Imagem = "noDrink.png";
+                }
+
+            }
+
+            
             if (ModelState.IsValid)
             {
-                _context.Add(bebidas);
+                try
+                {
+                    _context.Add(bebida);
+                    await _context.SaveChangesAsync();
+                    if (hImagem)
+                    {
+                        using var stream = new FileStream(caminhoCompleto, FileMode.Create);
+                        await ImagemBeb.CopyToAsync(stream);
+                        
+                    }
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.StackTrace);
+
+                }
+
+                _context.Add(bebida);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CategoriaFK"] = new SelectList(_context.Categorias, "Id", "Id", bebidas.CategoriaFK);
-            return View(bebidas);
+            ViewData["CategoriaFK"] = new SelectList(_context.Categorias, "Id", "Id", bebida.CategoriaFK);
+            return View(bebida);
         }
 
         // GET: Bebidas/Edit/5
