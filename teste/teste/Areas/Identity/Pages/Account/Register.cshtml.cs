@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using teste.Data;
+using teste.Models;
 
 namespace teste.Areas.Identity.Pages.Account
 {
@@ -28,13 +29,15 @@ namespace teste.Areas.Identity.Pages.Account
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
         private readonly IWebHostEnvironment _caminho;
+        private readonly Teste _context;
 
         public RegisterModel(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             ILogger<RegisterModel> logger,
             IEmailSender emailSender,
-            IWebHostEnvironment caminho
+            IWebHostEnvironment caminho,
+            Teste context
             )
         {
             _userManager = userManager;
@@ -42,6 +45,7 @@ namespace teste.Areas.Identity.Pages.Account
             _logger = logger;
             _emailSender = emailSender;
             _caminho = caminho;
+            _context = context;
         }
 
         [BindProperty]
@@ -51,8 +55,14 @@ namespace teste.Areas.Identity.Pages.Account
 
         public IList<AuthenticationScheme> ExternalLogins { get; set; }
 
+        
+
         public class InputModel
         {
+            [Required(ErrorMessage = "O {0} é de preenchimento obrigatório")]
+            [StringLength(40, ErrorMessage = "O {0} não pode ter mais de {1} caracteres.")]
+            public string Nome { get; set; }
+
             [Required(ErrorMessage = "O {0} é de preenchimento obrigatório")]
             [EmailAddress]
             [Display(Name = "Email")]
@@ -64,18 +74,25 @@ namespace teste.Areas.Identity.Pages.Account
             [Display(Name = "Password")]
             public string Password { get; set; }
 
+            [Required]
             [DataType(DataType.Password)]
             [Display(Name = "Confirm password")]
             [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
             public string ConfirmPassword { get; set; }
 
-            public string Nome { get; set; }
+            
+            [DataType(DataType.Date), DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}", ApplyFormatInEditMode = true)]
+            [Display(Name = "Data de Nascimento")]
+            [Required]
+            public Nullable<System.DateTime> Datanasc { get; set; }
+
+            public string Fotografia { get; set; }
         }
 
         public async Task OnGetAsync(string returnUrl = null)
         {
             ReturnUrl = returnUrl;
-            ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+            //ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
         }
 
         public async Task<IActionResult> OnPostAsync(IFormFile fotoCliente, string returnUrl = null)
@@ -90,7 +107,7 @@ namespace teste.Areas.Identity.Pages.Account
                 string nomeFoto = "";
                 bool hImagem = false;
 
-                if (fotoCliente == null) { nomeFoto = "noUser.png"; }
+                if (fotoCliente == null) { nomeFoto = "../noUser.jpg"; }
                 else
                 {
                     if (fotoCliente.ContentType == "image/jpeg" || fotoCliente.ContentType == "image/jpg" || fotoCliente.ContentType == "image/png")
@@ -102,7 +119,7 @@ namespace teste.Areas.Identity.Pages.Account
                         string nome = g.ToString() + extensao;
 
                         
-                        caminhoCompleto = Path.Combine(_caminho.WebRootPath, "Imagens\\Users", nome);
+                        caminhoCompleto = Path.Combine(_caminho.WebRootPath, "Imagens/Clientes", nome);
 
                        
                         nomeFoto = nome;
@@ -113,7 +130,7 @@ namespace teste.Areas.Identity.Pages.Account
                     else
                     {
                        
-                        nomeFoto = "noUser.png";
+                        nomeFoto = "../noUser.png";
                     }
                 }
 
@@ -127,7 +144,18 @@ namespace teste.Areas.Identity.Pages.Account
                     RegisterTime = DateTime.Now
                 };
 
-                
+                var utilizador = new Clientes
+                {
+                    Nome = Input.Nome,
+                    Email = Input.Email,
+                    Fotografia = nomeFoto,
+                    Username = cliente.Id
+                };
+
+                _context.Add(utilizador);
+                await _context.SaveChangesAsync();
+
+
                 var result = await _userManager.CreateAsync(cliente, Input.Password);
 
                 if (result.Succeeded)

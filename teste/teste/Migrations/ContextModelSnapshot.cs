@@ -8,7 +8,7 @@ using teste.Data;
 
 namespace teste.Migrations
 {
-    [DbContext(typeof(Context))]
+    [DbContext(typeof(Teste))]
     partial class ContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)

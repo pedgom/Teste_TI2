@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -13,6 +14,7 @@ using teste.Models;
 
 namespace teste.Controllers
 {
+    [Authorize]
     public class BebidasController : Controller
     {
         private readonly Teste _context;
@@ -52,6 +54,7 @@ namespace teste.Controllers
         }
 
         // GET: Bebidas/Create
+        [Authorize(Roles = "Gestor")]
         public IActionResult Create()
         {
             ViewData["CategoriaFK"] = new SelectList(_context.Categorias, "Id", "Id");
@@ -61,6 +64,7 @@ namespace teste.Controllers
         // POST: Bebidas/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize(Roles = "Gestor")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Nome,Descricao,Preco,Imagem,Stock,CategoriaFK")] Bebidas bebida, IFormFile ImagemBeb)
@@ -114,8 +118,8 @@ namespace teste.Controllers
 
                 }
 
-                _context.Add(bebida);
-                await _context.SaveChangesAsync();
+                /*_context.Add(bebida);
+                await _context.SaveChangesAsync();*/
                 return RedirectToAction(nameof(Index));
             }
             ViewData["CategoriaFK"] = new SelectList(_context.Categorias, "Id", "Id", bebida.CategoriaFK);

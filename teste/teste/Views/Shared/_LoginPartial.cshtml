@@ -7,12 +7,12 @@
 {
     <li class="nav-item">
         @{
-            string nomeCliente = (await UserManager.GetUserAsync(User)).Nome;
-            string fotocliente = (await UserManager.GetUserAsync(User)).Fotografia;
+            string NomeCliente = (await UserManager.GetUserAsync(User)).Nome;
+            string Fotocliente = (await UserManager.GetUserAsync(User)).Fotografia;
         }
         <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">
-            <img src="~/Imagens/Clientes/@fotocliente" height="30" alt="fotografia do @nomeCliente" title="@nomeCliente" />
-            @nomeCliente
+            <img src="@Url.Content("~/Imagens/Clientes/")@Fotocliente" height="30" alt="fotografia do @NomeCliente" title="@NomeCliente" />
+            @NomeCliente
         </a>
     </li>
     <li class="nav-item">

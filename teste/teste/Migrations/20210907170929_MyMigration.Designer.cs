@@ -9,7 +9,7 @@ using teste.Data;
 
 namespace teste.Migrations
 {
-    [DbContext(typeof(Context))]
+    [DbContext(typeof(Teste))]
     [Migration("20210907170929_MyMigration")]
     partial class MyMigration
     {

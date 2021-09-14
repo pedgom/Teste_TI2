@@ -30,15 +30,17 @@ namespace teste
             services.AddDbContext<Teste>(options => options
                 .UseSqlServer(Configuration.GetConnectionString("DefaultConnection"))
                 );
-            services.AddDatabaseDeveloperPageExceptionFilter();
+            
 
             services.AddDefaultIdentity<ApplicationUser>
-                (options => options.SignIn.RequireConfirmedAccount = true)
+                (options => options.SignIn.RequireConfirmedAccount = false)
                 .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<Teste>();
             services.AddControllersWithViews();
             services.AddRazorPages();
-           
+
+            services.AddDbContext<Teste>(options =>
+                   options.UseSqlServer(Configuration.GetConnectionString("Context")));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

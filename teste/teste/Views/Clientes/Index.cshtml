@@ -47,7 +47,7 @@
             </td>
             <td>
                 <a asp-action="Details" asp-route-id="@item.Id">
-                    <img src="~/Imagens/@item.Fotografia" height="60" alt="Imagem do Cliente @item.Nome" title="@item.Nome" />
+                    <img src="@Url.Content("~/Imagens/Clientes/")@item.Fotografia" height="60" alt="Imagem do Cliente @item.Nome" title="@item.Nome" />
                 </a>
             </td>
             <td>
