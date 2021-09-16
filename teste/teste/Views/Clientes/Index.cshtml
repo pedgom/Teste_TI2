@@ -22,9 +22,6 @@
                 @Html.DisplayNameFor(model => model.Contacto)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Datanasc)
-            </th>
-            <th>
                 @Html.DisplayNameFor(model => model.Fotografia)
             </th>
             <th></th>
@@ -42,9 +39,8 @@
             <td>
                 @Html.DisplayFor(modelItem => item.Contacto)
             </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Datanasc)
-            </td>
+
+
             <td>
                 <a asp-action="Details" asp-route-id="@item.Id">
                     <img src="@Url.Content("~/Imagens/Clientes/")@item.Fotografia" height="60" alt="Imagem do Cliente @item.Nome" title="@item.Nome" />
