@@ -35,9 +35,18 @@ namespace teste.Controllers
         }
 
         // GET: Clientes
+        [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Clientes.ToListAsync());
+            try
+            {
+                var user = await _userManager.GetUserAsync(User);
+                var util = await _context.Clientes.FirstOrDefaultAsync(r => r.Username == user.Id);
+                
+
+                return View(await _context.Clientes.ToListAsync());
+            }
+            catch { return View(await _context.Clientes.ToListAsync()); }
         }
 
         // GET: Clientes/Details/5
@@ -48,12 +57,14 @@ namespace teste.Controllers
                 return NotFound();
             }
 
-            var clientes = await _context.Clientes.Where(m => m.Id == id)
+            var clientes = await _context.Clientes.Include(r => r.ListaDeReservas).Where(c => c.Id == id)
                                                    .FirstOrDefaultAsync();
             if (clientes == null)
             {
                 return NotFound();
             }
+            var cliente = await _userManager.GetUserAsync(User);
+            var util = await _context.Clientes.FirstOrDefaultAsync(r => r.Username == cliente.Id);
 
             return View(clientes);
         }

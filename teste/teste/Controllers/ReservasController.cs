@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -15,16 +16,20 @@ namespace teste.Controllers
     public class ReservasController : Controller
     {
         private readonly Teste _context;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public ReservasController(Teste context)
+        public ReservasController(Teste context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         // GET: Reservas
         public async Task<IActionResult> Index()
         {
-            var teste = _context.Reservas.Include(r => r.Bebida).Include(r => r.Cliente);
+            var user = await _userManager.GetUserAsync(User);
+            var util = await _context.Clientes.FirstOrDefaultAsync(r => r.Username == user.Id);
+            var teste = _context.Reservas.Include(r => r.Bebida).Include(r => r.Cliente).Where(r => r.ClienteFK == util.Id);
             return View(await teste.ToListAsync());
         }
 
@@ -39,20 +44,26 @@ namespace teste.Controllers
             var reservas = await _context.Reservas
                 .Include(r => r.Bebida)
                 .Include(r => r.Cliente)
-                .FirstOrDefaultAsync(m => m.ClienteFK == id);
+                .FirstOrDefaultAsync(m => m.Id == id);
             if (reservas == null)
             {
                 return NotFound();
             }
 
+            var user = await _userManager.GetUserAsync(User);
+            var util = await _context.Clientes.FirstOrDefaultAsync(r => r.Username == user.Id);
+
             return View(reservas);
         }
 
         // GET: Reservas/Create
-        public IActionResult Create()
+        public async Task<IActionResult> CreateAsync()
         {
-            ViewData["BebidaFK"] = new SelectList(_context.Bebidas, "Id", "Id");
-            ViewData["ClienteFK"] = new SelectList(_context.Clientes, "Id", "Nome");
+            ViewData["BebidaFK"] = new SelectList(_context.Set<Bebidas>(), "Id", "Id");
+            ViewData["ClienteFK"] = new SelectList(_context.Set<Clientes>(), "Id", "Email");
+
+            var user = await _userManager.GetUserAsync(User);
+            var util = await _context.Clientes.FirstOrDefaultAsync(r => r.Username == user.Id);
             return View();
         }
 
@@ -61,20 +72,26 @@ namespace teste.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,DataReserva,DataEntrega,Estado,Quantidade,BebidaFK,ClienteFK")] Reservas reservas)
+        public async Task<IActionResult> Create([Bind("Id,DataEntrega,Estado,Quantidade,BebidaFK,ClienteFK")] Reservas reservas)
         {
             if (ModelState.IsValid)
             {
+                reservas.DataReserva = DateTime.Now;
+                var cliente = await _userManager.GetUserAsync(User);
+                var util = await _context.Clientes.FirstOrDefaultAsync(r => r.Username == cliente.Id);
+                reservas.ClienteFK = util.Id;
+                _context.Update(util);
                 _context.Add(reservas);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["BebidaFK"] = new SelectList(_context.Bebidas, "Id", "Id", reservas.BebidaFK);
-            ViewData["ClienteFK"] = new SelectList(_context.Clientes, "Id", "Nome", reservas.ClienteFK);
+            ViewData["BebidaFK"] = new SelectList(_context.Set<Bebidas>(), "Id", "Id", reservas.BebidaFK);
+            ViewData["ClienteFK"] = new SelectList(_context.Set<Clientes>(), "Id", "Email", reservas.ClienteFK);
             return View(reservas);
         }
 
         // GET: Reservas/Edit/5
+        [Authorize(Roles = "Gestor")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -87,8 +104,8 @@ namespace teste.Controllers
             {
                 return NotFound();
             }
-            ViewData["BebidaFK"] = new SelectList(_context.Bebidas, "Id", "Id", reservas.BebidaFK);
-            ViewData["ClienteFK"] = new SelectList(_context.Clientes, "Id", "Nome", reservas.ClienteFK);
+            ViewData["BebidaFK"] = new SelectList(_context.Set<Bebidas>(), "Id", "Id", reservas.BebidaFK);
+            ViewData["ClienteFK"] = new SelectList(_context.Set<Clientes>(), "Id", "Email", reservas.ClienteFK);
             return View(reservas);
         }
 
@@ -97,9 +114,10 @@ namespace teste.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Gestor")]
         public async Task<IActionResult> Edit(int id, [Bind("Id,DataReserva,DataEntrega,Estado,Quantidade,BebidaFK,ClienteFK")] Reservas reservas)
         {
-            if (id != reservas.ClienteFK)
+            if (id != reservas.Id)
             {
                 return NotFound();
             }
@@ -113,7 +131,7 @@ namespace teste.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!ReservasExists(reservas.ClienteFK))
+                    if (!ReservasExists(reservas.Id))
                     {
                         return NotFound();
                     }
@@ -124,12 +142,13 @@ namespace teste.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["BebidaFK"] = new SelectList(_context.Bebidas, "Id", "Id", reservas.BebidaFK);
-            ViewData["ClienteFK"] = new SelectList(_context.Clientes, "Id", "Nome", reservas.ClienteFK);
+            ViewData["BebidaFK"] = new SelectList(_context.Set<Bebidas>(), "Id", "Id", reservas.BebidaFK);
+            ViewData["ClienteFK"] = new SelectList(_context.Set<Clientes>(), "Id", "Email", reservas.ClienteFK);
             return View(reservas);
         }
 
         // GET: Reservas/Delete/5
+        [Authorize(Roles = "Gestor")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -140,7 +159,7 @@ namespace teste.Controllers
             var reservas = await _context.Reservas
                 .Include(r => r.Bebida)
                 .Include(r => r.Cliente)
-                .FirstOrDefaultAsync(m => m.ClienteFK == id);
+                .FirstOrDefaultAsync(m => m.Id == id);
             if (reservas == null)
             {
                 return NotFound();
@@ -152,6 +171,7 @@ namespace teste.Controllers
         // POST: Reservas/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Gestor")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var reservas = await _context.Reservas.FindAsync(id);
@@ -162,7 +182,7 @@ namespace teste.Controllers
 
         private bool ReservasExists(int id)
         {
-            return _context.Reservas.Any(e => e.ClienteFK == id);
+            return _context.Reservas.Any(e => e.Id == id);
         }
     }
 }

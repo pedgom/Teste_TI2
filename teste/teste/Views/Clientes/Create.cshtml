@@ -1,9 +1,15 @@
 ﻿@model teste.Models.Clientes
 
 @{
-  
+
     ViewData["Title"] = "Create";
 }
+
+<br />
+<br />
+<br />
+<br />
+<br />
 
 <h1>Criar um novo Cliente</h1>
 
@@ -35,7 +41,7 @@
             </div>
             <div class="form-group">
                 <label asp-for="Fotografia" class="control-label"></label>
-              
+
                 <input type="file" name="fotoCliente" accept=".jpeg,.jpg,.png" style="color:blue;" />
                 <span asp-validation-for="Fotografia" class="text-danger"></span>
             </div>
@@ -53,3 +59,10 @@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }
+
+
+<br />
+<br />
+<br />
+<br />
+<br />

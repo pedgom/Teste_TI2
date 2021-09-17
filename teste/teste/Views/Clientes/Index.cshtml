@@ -4,6 +4,12 @@
     ViewData["Title"] = "Index";
 }
 
+<br />
+<br />
+<br />
+<br />
+<br />
+
 <h1>Clientes</h1>
 
 <p>
@@ -28,35 +34,42 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Nome)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Email)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Contacto)
-            </td>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Nome)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Email)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Contacto)
+                </td>
 
 
-            <td>
-                <a asp-action="Details" asp-route-id="@item.Id">
-                    <img src="@Url.Content("~/Imagens/Clientes/")@item.Fotografia" height="60" alt="Imagem do Cliente @item.Nome" title="@item.Nome" />
-                </a>
-            </td>
-            <td>
-                @if (User.Identity.IsAuthenticated)
-                {
-                    <text>
-                        <a asp-action="Edit" asp-route-id="@item.Id">Editar</a> |
-                        <a asp-action="Details" asp-route-id="@item.Id">Detalhes</a> |
-                        <a asp-action="Delete" asp-route-id="@item.Id">Eliminar</a>
-                    </text>
-                }
-            </td>
-        </tr>
-}
+                <td>
+                    <a asp-action="Details" asp-route-id="@item.Id">
+                        <img src="@Url.Content("~/Imagens/Clientes/")@item.Fotografia" height="60" alt="Imagem do Cliente @item.Nome" title="@item.Nome" />
+                    </a>
+                </td>
+                <td>
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <text>
+                           
+                            <a asp-action="Details" asp-route-id="@item.Id">Detalhes</a> |
+                            
+                        </text>
+                    }
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
+
+<br />
+<br />
+<br />
+<br />
+<br />

@@ -55,32 +55,7 @@ namespace teste.Areas.Identity.Pages.Account
 
         public IList<AuthenticationScheme> ExternalLogins { get; set; }
 
-        public class DateMinimumAgeAttribute : ValidationAttribute
-        {
-            public DateMinimumAgeAttribute(int minimumAge)
-            {
-                MinimumAge = minimumAge;
-                ErrorMessage = "{0} must be someone at least {1} years of age";
-            }
-
-            public override bool IsValid(object value)
-            {
-                DateTime date;
-                if ((value != null && DateTime.TryParse(value.ToString(), out date)))
-                {
-                    return date.AddYears(MinimumAge) < DateTime.Now;
-                }
-
-                return false;
-            }
-
-            public override string FormatErrorMessage(string name)
-            {
-                return string.Format(ErrorMessageString, name, MinimumAge);
-            }
-
-            public int MinimumAge { get; }
-        }
+        
 
         public class InputModel
         {
@@ -107,7 +82,7 @@ namespace teste.Areas.Identity.Pages.Account
             [Compare("Password", ErrorMessage = "As password´s não coincidem.")]
             public string ConfirmPassword { get; set; }
 
-            [DateMinimumAge(18, ErrorMessage = "Tem de ter mais de {0} anos.")]
+            
             [DataType(DataType.Date), DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}", ApplyFormatInEditMode = true)]
             [Display(Name = "Data de Nascimento")]
             [Required(ErrorMessage = "A {0} é de preenchimento obrigatório")]
@@ -119,7 +94,7 @@ namespace teste.Areas.Identity.Pages.Account
         public async Task OnGetAsync(string returnUrl = null)
         {
             ReturnUrl = returnUrl;
-            //ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+           
         }
 
         public async Task<IActionResult> OnPostAsync(IFormFile fotoCliente, string returnUrl = null)

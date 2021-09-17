@@ -1,9 +1,15 @@
 ﻿@model teste.Models.Clientes
 
 @{
-    
+
     ViewData["Title"] = "Details";
 }
+
+<br />
+<br />
+<br />
+<br />
+<br />
 
 <h1>Detalhes</h1>
 
@@ -22,18 +28,6 @@
         </dt>
         <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Email)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Contacto)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Contacto)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Datanasc)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Datanasc)
         </dd>
         <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Fotografia)
@@ -62,18 +56,24 @@ else
         </tr>
         @foreach (var reserva in Model.ListaDeReservas)
         {
-    <tr>
-        <td>@reserva.Bebida.Id</td>
-        <td>@reserva.Quantidade</td>
-        <td>@reserva.DataReserva</td>
-        <td>@reserva.Estado</td>
-        <td>@reserva.DataEntrega</td>
-        <td></td>
-    </tr>
+            <tr>
+                <td>@reserva.BebidaFK</td>
+                <td>@reserva.Quantidade</td>
+                <td>@reserva.DataReserva</td>
+                <td>@reserva.Estado</td>
+                <td>@reserva.DataEntrega</td>
+                <td></td>
+            </tr>
         }
     </table>
 }
 <div>
-    <a asp-action="Edit" asp-route-id="@Model.Id">Editar</a> |
+    
     <a asp-action="Index">Voltar à lista</a>
 </div>
+
+<br />
+<br />
+<br />
+<br />
+<br />
